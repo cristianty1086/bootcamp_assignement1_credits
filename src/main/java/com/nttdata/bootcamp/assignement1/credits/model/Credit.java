@@ -21,4 +21,7 @@ public class Credit {
     double currentBalance;
     CreditCard creditCard;
     Integer costumer_id;
+    String costumerType;
+    CreditType creditType;
+    Integer maxCredit;
 }
