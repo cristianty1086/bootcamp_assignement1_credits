@@ -7,18 +7,15 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "credit_card")
+@Document(collection = "credit_payment")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreditCard {
+public class CreditPayment {
     @Id
     Integer id;
-    String holderName;
-    String cardNumber;
-    String expireMonth;
-    String expireYear;
-    String ccv;
+    String registerDate;
+    double amount;
     Integer creditId;
 }
