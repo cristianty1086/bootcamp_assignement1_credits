@@ -59,21 +59,13 @@ public class CreditPaymentServiceImpl implements CreditPaymentService{
     @Override
     public Mono<CreditPayment> updateCreditPayment(CreditPayment creditPayment) {
         LOGGER.info("Solicitud realizada para actualizar al CreditPayment");
-        creditPaymentRepository.findById(creditPayment.getId())
-                .map( currCostumer -> {
-                    LOGGER.info("Cliente encontrado para el id: " + creditPayment.getId());
-                    currCostumer.setAmount(creditPayment.getAmount());
-                    return creditPaymentRepository.save(currCostumer);
-                });
-
-        return Mono.just(creditPayment);
+        return creditPaymentRepository.save(creditPayment);
     }
 
     @Override
     public Mono<Void> deleteCreditPayment(Integer creditPaymentId) {
         LOGGER.info("Solicitud realizada para crear CreditPayment");
-        creditPaymentRepository.deleteById(creditPaymentId);
-        return null;
+        return creditPaymentRepository.deleteById(creditPaymentId);
     }
 
     @Override

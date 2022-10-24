@@ -29,7 +29,7 @@ public class CreditCardController {
         return creditCardService.readCreditCard(id);
     }
 
-    @PutMapping(value = "update/{id}")
+    @PutMapping(value = "update")
     @ResponseBody
     public Mono<CreditCard> updateCredit(@RequestBody CreditCard creditCard){
         return creditCardService.updateCreditCard(creditCard);

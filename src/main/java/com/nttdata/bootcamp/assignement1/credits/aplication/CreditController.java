@@ -28,7 +28,7 @@ public class CreditController {
         return creditService.readCredit(id);
     }
 
-    @PutMapping(value = "update/{id}")
+    @PutMapping(value = "update")
     @ResponseBody
     public Mono<Credit> updateCredit(@RequestBody Credit credit){
         return creditService.updateCredit(credit);

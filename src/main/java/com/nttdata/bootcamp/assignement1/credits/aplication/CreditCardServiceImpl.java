@@ -32,25 +32,13 @@ public class CreditCardServiceImpl implements CreditCardService{
     @Override
     public Mono<CreditCard> updateCreditCard(CreditCard creditCard) {
         LOGGER.info("Solicitud realizada para actualizar al CreditCard");
-        creditCardRepository.findById(creditCard.getId())
-                .map( currCostumer -> {
-                    LOGGER.info("Cliente encontrado para el id: " + creditCard.getId());
-                    currCostumer.setHolderName(creditCard.getHolderName());
-                    currCostumer.setCardNumber(creditCard.getCardNumber());
-                    currCostumer.setExpireMonth(creditCard.getExpireMonth());
-                    currCostumer.setExpireYear(creditCard.getExpireYear());
-                    currCostumer.setCcv(creditCard.getCcv());
-                    return creditCardRepository.save(currCostumer);
-                });
-
-        return Mono.just(creditCard);
+        return creditCardRepository.save(creditCard);
     }
 
     @Override
     public Mono<Void> deleteCreditCard(Integer creditCardId) {
         LOGGER.info("Solicitud realizada para crear CreditCard");
-        creditCardRepository.deleteById(creditCardId);
-        return null;
+        return creditCardRepository.deleteById(creditCardId);
     }
 
     @Override

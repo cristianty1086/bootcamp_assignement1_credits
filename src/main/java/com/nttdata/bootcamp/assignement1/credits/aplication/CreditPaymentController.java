@@ -29,7 +29,7 @@ public class CreditPaymentController {
         return creditPaymentService.readCreditPayment(id);
     }
 
-    @PutMapping(value = "update/{id}")
+    @PutMapping(value = "update")
     @ResponseBody
     public Mono<CreditPayment> updateCredit(@RequestBody CreditPayment Credit){
         return creditPaymentService.updateCreditPayment(Credit);
