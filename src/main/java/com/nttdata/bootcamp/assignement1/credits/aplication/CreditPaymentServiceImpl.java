@@ -3,14 +3,18 @@ package com.nttdata.bootcamp.assignement1.credits.aplication;
 import com.nttdata.bootcamp.assignement1.credits.infraestructure.CreditPaymentRepository;
 import com.nttdata.bootcamp.assignement1.credits.model.Credit;
 import com.nttdata.bootcamp.assignement1.credits.model.CreditPayment;
+import com.nttdata.bootcamp.assignement1.credits.model.CreditPaymentType;
+import com.nttdata.bootcamp.assignement1.credits.utilities.BuilderUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 
 @Service
 public class CreditPaymentServiceImpl implements CreditPaymentService{
@@ -24,34 +28,51 @@ public class CreditPaymentServiceImpl implements CreditPaymentService{
     CreditService creditService;
 
     @Override
-    public Mono<CreditPayment> createCreditPayment(Mono<CreditPayment> creditPayment) {
+    public Mono<CreditPayment> createCreditPayment(CreditPayment creditPayment) {
         LOGGER.info("Solicitud realizada para crear creditPayment");
         if( creditPayment == null ) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Datos insuficientes", null);
         }
-        Optional<CreditPayment> creditPayment1 = creditPayment.blockOptional();
-        if( !creditPayment1.isPresent() ) {
-            LOGGER.error("Error, datos enviados incompletos");
-            return null;
+        if( creditPayment.getCreditId() == null || creditPayment.getCreditId().isEmpty() ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Falta: indidcar creditId", null);
+        }
+        if( creditPayment.getCreditPaymentType() == null ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error: Envie el tipo de pago de credito", null);
         }
 
-        CreditPayment _creditPayment1 = creditPayment1.get();
-        Mono<Credit> credit = creditService.readCredit(_creditPayment1.getCreditId());
-        if( !credit.blockOptional().isPresent() ) {
-            LOGGER.error("Error, datos enviados incompletos");
-            return null;
+        String url = BuilderUrl.buildGetCredit(creditPayment.getCreditId());
+        RestTemplate restTemplate = new RestTemplate();
+        Credit credit = restTemplate.getForObject(url, Credit.class);
+        if( credit == null ) {
+            LOGGER.error("Error: credito no encontrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error: credito no encontrado", null);
         }
-        Credit credit1 = credit.blockOptional().get();
-        if( credit1.getCurrentBalance() + _creditPayment1.getAmount() > credit1.getLimitAmount() ) {
+        if( credit.getCurrentBalance() + creditPayment.getAmount() > credit.getLimitAmount() ) {
             LOGGER.error("Error, el movimiento supera el maximo permitido para la tarjeta");
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error, el movimiento supera el maximo permitido para la tarjeta", null);
         }
 
-        return creditPayment.flatMap(creditPaymentRepository::insert);
+        // actualizar el saldo
+        double salida = 0.0;
+        if (creditPayment.getCreditPaymentType() == CreditPaymentType.deposit) {
+            salida = credit.getCurrentBalance() + creditPayment.getAmount();
+        } else if (creditPayment.getCreditPaymentType() == CreditPaymentType.withdrawal) {
+            salida = credit.getCurrentBalance() - creditPayment.getAmount();
+            if(  salida < 0 ) {
+                LOGGER.error("Error, el movimiento de retiro es mayor al disponible en su cuenta");
+                return null;
+            }
+        }
+
+        credit.setCurrentBalance( salida );
+        String url2 = BuilderUrl.buildUpdateCredit();
+        restTemplate.put(url2, credit);
+
+        return creditPaymentRepository.save(creditPayment);
     }
 
     @Override
-    public Mono<CreditPayment> readCreditPayment(Integer creditPaymentId) {
+    public Mono<CreditPayment> readCreditPayment(String creditPaymentId) {
         LOGGER.info("Solicitud realizada para obtener la informacion de un CreditPayment");
         return creditPaymentRepository.findById(creditPaymentId);
     }
@@ -63,7 +84,7 @@ public class CreditPaymentServiceImpl implements CreditPaymentService{
     }
 
     @Override
-    public Mono<Void> deleteCreditPayment(Integer creditPaymentId) {
+    public Mono<Void> deleteCreditPayment(String creditPaymentId) {
         LOGGER.info("Solicitud realizada para crear CreditPayment");
         return creditPaymentRepository.deleteById(creditPaymentId);
     }

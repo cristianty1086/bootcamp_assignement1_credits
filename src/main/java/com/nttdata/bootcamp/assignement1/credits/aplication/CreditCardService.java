@@ -9,11 +9,11 @@ public interface CreditCardService {
     // crear
     Mono<CreditCard> createCreditCard(Mono<CreditCard> creditCard);
     // leer
-    Mono<CreditCard> readCreditCard(Integer creditCardId);
+    Mono<CreditCard> readCreditCard(String creditCardId);
     // actualizar
     Mono<CreditCard> updateCreditCard(CreditCard creditCard);
     // delete
-    Mono<Void> deleteCreditCard(Integer creditCardId);
+    Mono<Void> deleteCreditCard(String creditCardId);
     // leer todas
     Flux<CreditCard> listarTodos();
 }

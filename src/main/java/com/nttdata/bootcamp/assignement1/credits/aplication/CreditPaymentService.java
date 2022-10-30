@@ -7,13 +7,13 @@ import reactor.core.publisher.Mono;
 
 public interface CreditPaymentService {
     // crear
-    Mono<CreditPayment> createCreditPayment(Mono<CreditPayment> creditPayment);
+    Mono<CreditPayment> createCreditPayment(CreditPayment creditPayment);
     // leer
-    Mono<CreditPayment> readCreditPayment(Integer creditPaymentId);
+    Mono<CreditPayment> readCreditPayment(String creditPaymentId);
     // actualizar
     Mono<CreditPayment> updateCreditPayment(CreditPayment creditPayment);
     // delete
-    Mono<Void> deleteCreditPayment(Integer creditPaymentId);
+    Mono<Void> deleteCreditPayment(String creditPaymentId);
     // leer todas
     Flux<CreditPayment> listarTodos();
 }

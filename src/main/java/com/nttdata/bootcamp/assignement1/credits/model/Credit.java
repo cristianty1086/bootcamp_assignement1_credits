@@ -7,6 +7,9 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigInteger;
+import java.util.List;
+
 @Document(collection = "credit")
 @Getter
 @Setter
@@ -14,14 +17,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Credit {
     @Id
-    Integer id;
+    String id;
     double limitAmount;
     String nextDatePayment;
     String nextAmountPayment;
     double currentBalance;
-    CreditCard creditCard;
-    Integer costumer_id;
+    List<CreditCard> creditCard;
+    BigInteger costumerId;
     String costumerType;
     CreditType creditType;
-    Integer maxCredit;
 }

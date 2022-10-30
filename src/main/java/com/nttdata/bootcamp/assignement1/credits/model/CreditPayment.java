@@ -14,8 +14,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class CreditPayment {
     @Id
-    Integer id;
+    String id;
     String registerDate;
     double amount;
-    Integer creditId;
+    String creditId;
+    CreditPaymentType creditPaymentType;
 }

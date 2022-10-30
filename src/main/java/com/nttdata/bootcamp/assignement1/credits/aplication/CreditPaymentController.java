@@ -1,6 +1,5 @@
 package com.nttdata.bootcamp.assignement1.credits.aplication;
 
-import com.nttdata.bootcamp.assignement1.credits.model.Credit;
 import com.nttdata.bootcamp.assignement1.credits.model.CreditPayment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,12 +19,12 @@ public class CreditPaymentController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<CreditPayment> createCredit(@RequestBody CreditPayment creditPayment){
         System.out.println(creditPayment);
-        return creditPaymentService.createCreditPayment(Mono.just(creditPayment));
+        return creditPaymentService.createCreditPayment(creditPayment);
     }
 
-    @GetMapping(value = "get/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Mono<CreditPayment> getCreditById(@PathVariable("id") Integer id){
+    public Mono<CreditPayment> getCreditById(@PathVariable("id") String id){
         return creditPaymentService.readCreditPayment(id);
     }
 
@@ -37,11 +36,11 @@ public class CreditPaymentController {
 
     @DeleteMapping(value = "delete/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Mono<Void> deleteCreditById(@PathVariable("id") Integer id){
+    public Mono<Void> deleteCreditById(@PathVariable("id") String id){
         return creditPaymentService.deleteCreditPayment(id);
     }
 
-    @GetMapping(value = "getAll", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Flux<CreditPayment> listarTodos(){
         return creditPaymentService.listarTodos();

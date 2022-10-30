@@ -24,7 +24,7 @@ public class CreditCardServiceImpl implements CreditCardService{
     }
 
     @Override
-    public Mono<CreditCard> readCreditCard(Integer creditCardId) {
+    public Mono<CreditCard> readCreditCard(String creditCardId) {
         LOGGER.info("Solicitud realizada para obtener la informacion de un CreditCard");
         return creditCardRepository.findById(creditCardId);
     }
@@ -36,7 +36,7 @@ public class CreditCardServiceImpl implements CreditCardService{
     }
 
     @Override
-    public Mono<Void> deleteCreditCard(Integer creditCardId) {
+    public Mono<Void> deleteCreditCard(String creditCardId) {
         LOGGER.info("Solicitud realizada para crear CreditCard");
         return creditCardRepository.deleteById(creditCardId);
     }

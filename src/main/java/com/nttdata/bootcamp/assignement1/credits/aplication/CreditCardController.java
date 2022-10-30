@@ -1,6 +1,5 @@
 package com.nttdata.bootcamp.assignement1.credits.aplication;
 
-import com.nttdata.bootcamp.assignement1.credits.model.Credit;
 import com.nttdata.bootcamp.assignement1.credits.model.CreditCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,7 @@ public class CreditCardController {
 
     @GetMapping(value = "get/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Mono<CreditCard> getCreditById(@PathVariable("id") Integer id){
+    public Mono<CreditCard> getCreditById(@PathVariable("id") String id){
         return creditCardService.readCreditCard(id);
     }
 
@@ -37,7 +36,7 @@ public class CreditCardController {
 
     @DeleteMapping(value = "delete/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @ResponseBody
-    public Mono<Void> deleteCreditById(@PathVariable("id") Integer id){
+    public Mono<Void> deleteCreditById(@PathVariable("id") String id){
         return creditCardService.deleteCreditCard(id);
     }
 

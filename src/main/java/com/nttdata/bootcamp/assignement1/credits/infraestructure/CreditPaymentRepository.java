@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CreditPaymentRepository extends ReactiveMongoRepository<CreditPayment, Integer> {
+public interface CreditPaymentRepository extends ReactiveMongoRepository<CreditPayment, String> {
 
 }

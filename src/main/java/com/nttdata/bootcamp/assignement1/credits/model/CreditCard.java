@@ -14,11 +14,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class CreditCard {
     @Id
-    Integer id;
-    String holderName;
+    String id;
     String cardNumber;
     String expireMonth;
     String expireYear;
     String ccv;
-    Integer creditId;
+    Integer costumerId;
 }
