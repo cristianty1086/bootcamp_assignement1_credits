@@ -43,4 +43,19 @@ public class BuilderUrl {
 
         return ss.toString();
     }
+    public static String buildGetCreditsByCostumerId(BigInteger costumerId) {
+        StringBuilder ss = new StringBuilder();
+        ss.append(AppConstants.getCurrentUrl());
+        ss.append("/credit/get_by_costumer");
+        ss.append(costumerId);
+
+        return ss.toString();
+    }
+    public static String buildCreateMovementInCostumerId() {
+        StringBuilder ss = new StringBuilder();
+        ss.append(AppConstants.baseUrlCredits);
+        ss.append("/movement/create");
+
+        return ss.toString();
+    }
 }

@@ -26,4 +26,5 @@ public class Credit {
     BigInteger costumerId;
     String costumerType;
     CreditType creditType;
+    String createdAt;
 }

@@ -45,4 +45,16 @@ public class CreditPaymentController {
     public Flux<CreditPayment> listarTodos(){
         return creditPaymentService.listarTodos();
     }
+
+    @PostMapping("create_from_third/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<CreditPayment> createCredit(@RequestBody CreditPayment creditPayment, @PathVariable("id") String bankAccountId){
+        System.out.println(creditPayment);
+        return creditPaymentService.createCreditPaymentOfThird(creditPayment, bankAccountId);
+    }
+    @GetMapping(value = "get_last_ten_movements/{creditCardId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Flux<CreditPayment> getLastTenMovements(@PathVariable("creditCardId") String creditCardId){
+        return creditPaymentService.getLastTen(creditCardId);
+    }
 }

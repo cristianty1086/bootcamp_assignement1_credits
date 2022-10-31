@@ -8,6 +8,7 @@ public class AppConstants {
 
     public static String baseUrl = "http://localhost";
     public static String baseUrlCostumer = "http://localhost:8083";
+    public static String baseUrlCredits = "http://localhost:8085";
     public static String getCurrentUrl() {
         String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
         String appConfigPath = rootPath + "application.properties";

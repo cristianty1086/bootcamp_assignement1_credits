@@ -5,7 +5,8 @@ import com.nttdata.bootcamp.assignement1.credits.model.Credit;
 import com.nttdata.bootcamp.assignement1.credits.model.CreditCard;
 import com.nttdata.bootcamp.assignement1.credits.model.CreditType;
 import com.nttdata.bootcamp.assignement1.credits.utilities.BuilderUrl;
-import org.bson.json.JsonObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CreditServiceImpl implements CreditService {
@@ -28,6 +30,9 @@ public class CreditServiceImpl implements CreditService {
 
     @Autowired
     CreditRepository creditRepository;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Mono<Credit> createCredit(Credit credit) {
@@ -49,7 +54,6 @@ public class CreditServiceImpl implements CreditService {
 
         // obtener el numero de creditos de un cliente
         String url = BuilderUrl.buildCountCreditsByCostumerId(credit.getCostumerId());
-        RestTemplate restTemplate = new RestTemplate();
         Long count = restTemplate.getForObject(url, Long.class);
         if( count == null ) {
             LOGGER.error("Error: al obtener el numero de creditos del cliente. Contactese con el soporte tecnico.");
@@ -98,6 +102,35 @@ public class CreditServiceImpl implements CreditService {
             creditCards.add(creditCard);
             credit.setCreditCard(creditCards);
         }
+
+        // buscar entre las cuentas, cuantos tienen deuda pendiente
+        String url5 = BuilderUrl.buildGetCreditsByCostumerId(credit.getCostumerId());
+        String strBankAccount = restTemplate.getForObject(url5, String.class);
+        JSONArray jsonArray = new JSONArray(strBankAccount);
+        int[] cuentas_pendientes = {0};
+        jsonArray.forEach(it -> {
+            JSONObject jsonObject = (JSONObject) it;
+            String nextDatePayment = jsonObject.getString("nextDatePayment");
+            if( nextDatePayment == null || nextDatePayment.isEmpty() ) {
+                LOGGER.warn("Sin informacion de fecha de pago siguiente");
+            } else {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                LocalDateTime d1 = LocalDateTime.parse(nextDatePayment, dtf);
+                LocalDateTime d2 = LocalDateTime.now();
+                if(d1.isBefore(d2)) {
+                    LOGGER.info("Tiene una deuda pendiente");
+                    cuentas_pendientes[0] += 1;
+                }
+            }
+        });
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        credit.setCreatedAt(LocalDateTime.now().format(dtf));
+
+        if( cuentas_pendientes[0] > 0 ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tiene un credito pendiente de pago, no podra crear una nueva cuenta bancaria", null);
+        }
+
         return creditRepository.save(credit);
     }
 
@@ -136,8 +169,34 @@ public class CreditServiceImpl implements CreditService {
     public Mono<Long> getCountCreditById(BigInteger costumerId){
         return creditRepository.countByCostumerId(costumerId);
     }
+
     @Override
     public Mono<Long> getCountCreditCardsById(BigInteger costumerId){
         return creditRepository.countByCostumerIdAndCreditType(costumerId,CreditType.credit_card);
     }
+
+    @Override
+    public Flux<Credit> listarTodosBeetween(String dateInit, String dateEnd) {
+        LOGGER.info("Solicitud realizada para el envio de todos los BankAccount en un periodo determinado");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss");
+        return creditRepository.findAll().filter(a -> {
+            if( dateInit != null && dateEnd != null ) {
+                LocalDateTime d1 = LocalDateTime.parse(a.getCreatedAt(), dtf);
+                LocalDateTime d2 = LocalDateTime.parse(dateInit, dtf);
+                LocalDateTime d3 = LocalDateTime.parse(dateEnd, dtf);
+                return (d1.isAfter(d2) && d1.isBefore(d3));
+            } else if(dateInit != null) {
+                LocalDateTime d1 = LocalDateTime.parse(a.getCreatedAt(), dtf);
+                LocalDateTime d2 = LocalDateTime.parse(dateInit, dtf);
+                return d1.isAfter(d2);
+            } else if(dateEnd != null) {
+                LocalDateTime d1 = LocalDateTime.parse(a.getCreatedAt(), dtf);
+                LocalDateTime d3 = LocalDateTime.parse(dateEnd, dtf);
+                return d1.isBefore(d3);
+            } else {
+                return false;
+            }
+        });
+    }
+
 }
