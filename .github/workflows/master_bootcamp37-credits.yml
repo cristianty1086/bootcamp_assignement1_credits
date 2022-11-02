@@ -38,7 +38,7 @@ jobs:
       with:
         context: ./
         push: true
-        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_0755974d818c484e93b798780932006d }}/ms37-credits:${{ github.sha }}
+        tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_0755974d818c484e93b798780932006d }}/ms37-credits:${{github.run_number }}
         file: ./Dockerfile
 
   deploy:
